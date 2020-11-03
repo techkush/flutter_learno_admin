@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_learno_admin/screens/home_screen.dart';
 import 'package:flutter_learno_admin/screens/lesson_screen.dart';
@@ -95,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   SideButton(
                     handleFunction: setPageIndex,
                     name: "Level",
-                    icon: Icons.album_rounded,
+                    icon: Icons.ac_unit,
                     pageScreen: 1,
                   ),
                   SideButton(
@@ -107,13 +108,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   SideButton(
                     handleFunction: setPageIndex,
                     name: "Module",
-                    icon: Icons.view_module_outlined,
+                    icon: Icons.accessibility,
                     pageScreen: 3,
                   ),
                   SideButton(
                     handleFunction: setPageIndex,
                     name: "Topics",
-                    icon: Icons.topic,
+                    icon: Icons.add,
                     pageScreen: 4,
                   ),
                   SideButton(
