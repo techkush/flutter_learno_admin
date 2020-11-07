@@ -11,7 +11,7 @@ import 'package:flutter_learno_admin/screens/subject_screen.dart';
 import 'package:flutter_learno_admin/screens/topic_screen.dart';
 import 'package:flutter_learno_admin/widgets/side_buttons.dart';
 
-void main() {
+void main() async {
   runApp(MyApp());
 }
 
@@ -143,10 +143,9 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Container(
                 width: MediaQuery.of(context).size.width - 230,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: Colors.white38)
-                ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: Colors.white38)),
                 child: screen(context),
               ),
             )
