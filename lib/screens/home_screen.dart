@@ -1,4 +1,7 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+
+final StorageReference storageRef = FirebaseStorage.instance.ref();
 
 class HomeScreen extends StatefulWidget {
   @override

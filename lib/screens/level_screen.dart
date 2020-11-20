@@ -2,6 +2,7 @@ import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_learno_admin/widgets/progress.dart';
 
 class LevelScreen extends StatefulWidget {
   @override
@@ -9,12 +10,12 @@ class LevelScreen extends StatefulWidget {
 }
 
 class _LevelScreenState extends State<LevelScreen> {
-
   String message = '';
   Color messageColor = Colors.green;
   bool isThereAMessage = false;
   TextEditingController levelController = TextEditingController();
   List<String> _levelList = [];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -36,6 +37,9 @@ class _LevelScreenState extends State<LevelScreen> {
   }
 
   Future<void> deleteData(int index) async {
+    setState(() {
+      isLoading = true;
+    });
     await getLevelList();
     _levelList.removeAt(index);
     FirebaseFirestore.instance
@@ -47,9 +51,15 @@ class _LevelScreenState extends State<LevelScreen> {
       errorMessageOpen(msg: 'Something is wrong!', color: Colors.red);
     });
     _levelList.clear();
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> submit() async {
+    setState(() {
+      isLoading = true;
+    });
     await getLevelList();
     if (_levelList == null) {
       FirebaseFirestore.instance.collection('app_settings').doc('levels').set({
@@ -76,9 +86,15 @@ class _LevelScreenState extends State<LevelScreen> {
     }
     levelController.clear();
     _levelList.clear();
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> getLevelList() async {
+    setState(() {
+      isLoading = true;
+    });
     final DocumentSnapshot doc = await FirebaseFirestore.instance
         .collection('app_settings')
         .doc('levels')
@@ -89,6 +105,9 @@ class _LevelScreenState extends State<LevelScreen> {
         _levelList.add(e);
       }
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -101,6 +120,7 @@ class _LevelScreenState extends State<LevelScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            isLoading ? linearProgress() : Container(),
             Row(
               children: <Widget>[
                 Icon(
@@ -111,31 +131,11 @@ class _LevelScreenState extends State<LevelScreen> {
                   width: 10,
                 ),
                 Text(
-                  'Level Screen',
+                  'Levels',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 )
               ],
             ),
-            SizedBox(
-              height: 10,
-            ),
-            // Error Message
-            isThereAMessage
-                ? Container(
-                    width: MediaQuery.of(context).size.width - 260,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: messageColor,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        message,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ))
-                : Container(),
             SizedBox(
               height: 20,
             ),
@@ -166,20 +166,41 @@ class _LevelScreenState extends State<LevelScreen> {
                         ),
                         color: Colors.blue,
                         onPressed: () {
-                          submit();
+                          if (levelController.text.length < 1) {
+                            errorMessageOpen(
+                                msg: 'Level field is empty.',
+                                color: Colors.red);
+                          } else {
+                            submit();
+                          }
                         },
                       ),
                     ),
                   ),
                 ),
-
+                isThereAMessage
+                    ? Container(
+                        width: 300,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: messageColor,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            message,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ))
+                    : Container(),
                 // Level List
               ],
             ),
             Divider(
               height: 1,
             ),
-            Container(width: 490,child: _levelListWidget(context))
+            Container(width: 490, child: _levelListWidget(context))
           ],
         ),
       ),
@@ -214,16 +235,23 @@ class _LevelScreenState extends State<LevelScreen> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              SizedBox(width: 20,),
+                              SizedBox(
+                                width: 20,
+                              ),
                               Text('🔯   ${sections[i]}'),
                             ],
                           ),
                           Row(
                             children: <Widget>[
-                              InkWell(child: Text('❌'), onTap: (){
-                                deleteData(i);
-                              },),
-                              SizedBox(width: 20,),
+                              InkWell(
+                                child: Text('❌'),
+                                onTap: () {
+                                  deleteData(i);
+                                },
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
                             ],
                           ),
                         ],
@@ -234,7 +262,9 @@ class _LevelScreenState extends State<LevelScreen> {
               },
             );
           } else {
-            return Container(child: Text('No Values!'),);
+            return Container(
+              child: Text('No Values!'),
+            );
           }
         });
   }
