@@ -3,10 +3,10 @@ import 'dart:html';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_learno_admin/errors/common_errors.dart';
 import 'package:flutter_learno_admin/screens/level_screen.dart';
 import 'package:flutter_learno_admin/widgets/drop_down.dart';
 import 'package:flutter_learno_admin/widgets/progress.dart';
+import 'package:flutter_learno_admin/widgets/subject_screen_list.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase/firebase.dart' as fb;
 
@@ -200,7 +200,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
             SizedBox(
               height: 20,
             ),
-            _showSubjectList(),
+            SubjectList(),
           ],
         ),
       ),
@@ -330,7 +330,4 @@ class _SubjectScreenState extends State<SubjectScreen> {
           );
   }
 
-  Widget _showSubjectList() {
-    return Container();
-  }
 }
