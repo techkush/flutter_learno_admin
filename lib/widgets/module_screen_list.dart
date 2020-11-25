@@ -2,12 +2,12 @@ import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class SubjectList extends StatelessWidget {
+class ModuleList extends StatelessWidget {
   Widget _levelListWidget(BuildContext context) {
     Stream<QuerySnapshot> courseDocStream = FirebaseFirestore.instance
         .collection('app_settings')
-        .doc('subjects')
-        .collection('subjectList')
+        .doc('modules')
+        .collection('moduleList')
         .snapshots();
 
     // courseDocStream.forEach((field) {
@@ -35,33 +35,33 @@ class SubjectList extends StatelessWidget {
                     height: 100,
                     child: Card(
                         child: ListTile(
-                      leading: Container(
-                        height: 300,
-                        width: 250,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10)
-                        ),
-                        child: Image(
-                          image: NetworkImage(courseDocument[i]['mediaUrl']),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      title: InkWell(child: Text('Subject : ${courseDocument[i]['name']}'), onTap: (){
-                        FlutterClipboard.copy(courseDocument[i]['id']).then(( value ) => print('copied'));
-                      },),
-                      subtitle: Text('Level : ${courseDocument[i]['level']}'),
-                      trailing: InkWell(
-                        child: Text('❌'),
-                        onTap: () {
-                          FirebaseFirestore.instance
-                              .collection('app_settings')
-                              .doc('subjects')
-                              .collection('subjectList')
-                              .doc(courseDocument[i]['id'])
-                              .delete();
-                        },
-                      ),
-                    )),
+                          leading: Container(
+                            height: 300,
+                            width: 250,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10)
+                            ),
+                            child: Image(
+                              image: NetworkImage(courseDocument[i]['mediaUrl']),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          title: InkWell(child: Text('Module : ${courseDocument[i]['name']}'), onTap: (){
+                            FlutterClipboard.copy(courseDocument[i]['id']).then(( value ) => print('copied'));
+                          },),
+                          subtitle: Text('Subject Id : ${courseDocument[i]['subjectId']}'),
+                          trailing: InkWell(
+                            child: Text('❌'),
+                            onTap: () {
+                              FirebaseFirestore.instance
+                                  .collection('app_settings')
+                                  .doc('modules')
+                                  .collection('moduleList')
+                                  .doc(courseDocument[i]['id'])
+                                  .delete();
+                            },
+                          ),
+                        )),
                   ),
                 );
               },
