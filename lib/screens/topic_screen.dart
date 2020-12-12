@@ -1,9 +1,9 @@
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_learno_admin/widgets/module_screen_list.dart';
 import 'package:flutter_learno_admin/widgets/progress.dart';
 import 'package:flutter_learno_admin/widgets/topic_screen_list.dart';
 import 'package:uuid/uuid.dart';
@@ -20,7 +20,7 @@ class _TopicScreenState extends State<TopicScreen> {
   bool isLoading = false;
   String _moduleId = '';
   String _topic = '';
-  String topicId = Uuid().v4();
+
   Uint8List _uploadedImage;
   bool _isThereAMessage = false;
   String _message;
@@ -47,7 +47,8 @@ class _TopicScreenState extends State<TopicScreen> {
     setState(() {
       isLoading = true;
     });
-    final path = 'topic/$topicId';
+    String imageId = Uuid().v4();
+    final path = 'topic/$imageId';
     await fb
         .storage()
         .refFromURL('gs://learno-c120b.appspot.com/')
@@ -61,18 +62,13 @@ class _TopicScreenState extends State<TopicScreen> {
           .child(path)
           .getDownloadURL()
           .then((value) {
-        uploadToSubjectData(value.toString());
+        uploadToSubjectData(value.toString(), imageId);
       });
-    });
-    topicController.clear();
-    moduleController.clear();
-    setState(() {
-      _uploadedImage = null;
-      isLoading = false;
     });
   }
 
-  uploadToSubjectData(String mediaUrl) async {
+  uploadToSubjectData(String mediaUrl, String imageId) async {
+    String topicId = Uuid().v4();
     FirebaseFirestore.instance
         .collection('app_settings')
         .doc('topics')
@@ -83,14 +79,19 @@ class _TopicScreenState extends State<TopicScreen> {
       'mediaUrl': mediaUrl,
       'id': topicId,
       'name': _topic,
-      'quiz': null,
-      'lessons': null
+      'imageId': imageId
     }).then((value) {
       setState(() {
         _message = 'Added module details!';
         _messageColor = Colors.green;
         _isThereAMessage = true;
+        _uploadedImage = null;
+        isLoading = false;
+        _moduleId = '';
+        _topic = '';
       });
+      topicController.clear();
+      moduleController.clear();
       Future.delayed(Duration(seconds: 3), () {
         setState(() {
           _isThereAMessage = false;
