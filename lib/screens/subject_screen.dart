@@ -21,7 +21,6 @@ class _SubjectScreenState extends State<SubjectScreen> {
   bool isLoading = false;
   String _level = '';
   String _subject = '';
-  String subjectId = Uuid().v4();
   Uint8List _uploadedImage;
   bool _isThereAMessage = false;
   String _message;
@@ -48,7 +47,8 @@ class _SubjectScreenState extends State<SubjectScreen> {
     setState(() {
       isLoading = true;
     });
-    final path = 'subject/$subjectId';
+    String imageId = Uuid().v4();
+    final path = 'subject/$imageId';
     await fb
         .storage()
         .refFromURL('gs://learno-c120b.appspot.com/')
@@ -62,17 +62,13 @@ class _SubjectScreenState extends State<SubjectScreen> {
           .child(path)
           .getDownloadURL()
           .then((value) {
-        uploadToSubjectData(value.toString());
+        uploadToSubjectData(value.toString(), imageId);
       });
-    });
-    subjectController.clear();
-    setState(() {
-      _uploadedImage = null;
-      isLoading = false;
     });
   }
 
-  uploadToSubjectData(String mediaUrl) async {
+  uploadToSubjectData(String mediaUrl, String imageId) async {
+    String subjectId = Uuid().v4();
     FirebaseFirestore.instance
         .collection('app_settings')
         .doc('subjects')
@@ -81,6 +77,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
         .set({
       'name': _subject,
       'level': _level,
+      'imageId': imageId,
       'mediaUrl': mediaUrl,
       'id': subjectId
     }).then((value) {
@@ -88,7 +85,11 @@ class _SubjectScreenState extends State<SubjectScreen> {
         _message = 'Added subject details!';
         _messageColor = Colors.green;
         _isThereAMessage = true;
+        _uploadedImage = null;
+        isLoading = false;
+        _subject = '';
       });
+      subjectController.clear();
       Future.delayed(Duration(seconds: 3), () {
         setState(() {
           _isThereAMessage = false;

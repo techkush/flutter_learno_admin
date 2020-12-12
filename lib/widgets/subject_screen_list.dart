@@ -1,5 +1,6 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase/firebase.dart' as fb;
 import 'package:flutter/material.dart';
 
 class SubjectList extends StatelessWidget {
@@ -39,26 +40,36 @@ class SubjectList extends StatelessWidget {
                         height: 300,
                         width: 250,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10)
-                        ),
+                            borderRadius: BorderRadius.circular(10)),
                         child: Image(
                           image: NetworkImage(courseDocument[i]['mediaUrl']),
                           fit: BoxFit.cover,
                         ),
                       ),
-                      title: InkWell(child: Text('Subject : ${courseDocument[i]['name']}'), onTap: (){
-                        FlutterClipboard.copy(courseDocument[i]['id']).then(( value ) => print('copied'));
-                      },),
+                      title: InkWell(
+                        child: Text('Subject : ${courseDocument[i]['name']}'),
+                        onTap: () {
+                          FlutterClipboard.copy(courseDocument[i]['id'])
+                              .then((value) => print('copied'));
+                        },
+                      ),
                       subtitle: Text('Level : ${courseDocument[i]['level']}'),
                       trailing: InkWell(
                         child: Text('❌'),
-                        onTap: () {
-                          FirebaseFirestore.instance
-                              .collection('app_settings')
-                              .doc('subjects')
-                              .collection('subjectList')
-                              .doc(courseDocument[i]['id'])
-                              .delete();
+                        onTap: () async {
+                          await fb
+                              .storage()
+                              .refFromURL('gs://learno-c120b.appspot.com/')
+                              .child('subject/${courseDocument[i]['imageId']}')
+                              .delete()
+                              .then((value) {
+                            FirebaseFirestore.instance
+                                .collection('app_settings')
+                                .doc('subjects')
+                                .collection('subjectList')
+                                .doc(courseDocument[i]['id'])
+                                .delete();
+                          });
                         },
                       ),
                     )),

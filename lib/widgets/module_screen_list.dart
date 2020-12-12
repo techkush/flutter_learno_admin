@@ -1,6 +1,7 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase/firebase.dart' as fb;
 
 class ModuleList extends StatelessWidget {
   Widget _levelListWidget(BuildContext context) {
@@ -52,13 +53,20 @@ class ModuleList extends StatelessWidget {
                           subtitle: Text('Subject Id : ${courseDocument[i]['subjectId']}'),
                           trailing: InkWell(
                             child: Text('❌'),
-                            onTap: () {
-                              FirebaseFirestore.instance
-                                  .collection('app_settings')
-                                  .doc('modules')
-                                  .collection('moduleList')
-                                  .doc(courseDocument[i]['id'])
-                                  .delete();
+                            onTap: () async{
+                              await fb
+                                  .storage()
+                                  .refFromURL('gs://learno-c120b.appspot.com/')
+                                  .child('module/${courseDocument[i]['imageId']}')
+                                  .delete()
+                                  .then((value) {
+                                FirebaseFirestore.instance
+                                    .collection('app_settings')
+                                    .doc('modules')
+                                    .collection('moduleList')
+                                    .doc(courseDocument[i]['id'])
+                                    .delete();
+                              });
                             },
                           ),
                         )),

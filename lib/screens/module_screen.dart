@@ -19,7 +19,6 @@ class _ModuleScreenState extends State<ModuleScreen> {
   bool isLoading = false;
   String _subjectId = '';
   String _module = '';
-  String moduleId = Uuid().v4();
   Uint8List _uploadedImage;
   bool _isThereAMessage = false;
   String _message;
@@ -46,7 +45,8 @@ class _ModuleScreenState extends State<ModuleScreen> {
     setState(() {
       isLoading = true;
     });
-    final path = 'module/$moduleId';
+    String imageId = Uuid().v4();
+    final path = 'module/$imageId';
     await fb
         .storage()
         .refFromURL('gs://learno-c120b.appspot.com/')
@@ -60,19 +60,14 @@ class _ModuleScreenState extends State<ModuleScreen> {
           .child(path)
           .getDownloadURL()
           .then((value) {
-        uploadToSubjectData(value.toString());
+        uploadToSubjectData(value.toString(), imageId);
       });
-    });
-    subjectIdController.clear();
-    moduleController.clear();
-    setState(() {
-      _uploadedImage = null;
-      isLoading = false;
     });
   }
 
-  uploadToSubjectData(String mediaUrl) async {
-    FirebaseFirestore.instance
+  uploadToSubjectData(String mediaUrl, String imageId) async {
+    String moduleId = Uuid().v4();
+    await FirebaseFirestore.instance
         .collection('app_settings')
         .doc('modules')
         .collection('moduleList')
@@ -81,13 +76,19 @@ class _ModuleScreenState extends State<ModuleScreen> {
       'subjectId': _subjectId,
       'mediaUrl': mediaUrl,
       'id': moduleId,
+      'imageId': imageId,
       'name': _module
     }).then((value) {
       setState(() {
         _message = 'Added module details!';
         _messageColor = Colors.green;
         _isThereAMessage = true;
+        _uploadedImage = null;
+        isLoading = false;
+        _module = '';
       });
+      subjectIdController.clear();
+      moduleController.clear();
       Future.delayed(Duration(seconds: 3), () {
         setState(() {
           _isThereAMessage = false;
